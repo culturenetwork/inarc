@@ -20,8 +20,10 @@ UA="inarc-map-fetch/1.0 (https://indianarchitecture.org; ab@bbarch.net)"
 out="assets/india.geojson"
 
 candidates=(
-  "https://raw.githubusercontent.com/udit-001/india-maps-data/main/geojson/india.geojson"
   "https://raw.githubusercontent.com/udit-001/india-maps-data/main/geojson/states.geojson"
+  "https://raw.githubusercontent.com/udit-001/india-maps-data/main/geojson/india.geojson"
+  "https://raw.githubusercontent.com/udit-001/india-maps-data/master/geojson/states.geojson"
+  "https://raw.githubusercontent.com/udit-001/india-maps-data/master/geojson/india.geojson"
 )
 
 ok=""
