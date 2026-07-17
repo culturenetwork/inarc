@@ -6,6 +6,8 @@
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg?v=2">
 <title>IndianArchitecture.org — The Digital Atlas of India's Built Heritage</title>
 <link rel="stylesheet" href="assets/styles.css?v=4">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 </head>
 <body>
 
@@ -75,18 +77,11 @@
       </div>
       <a class="btn btn--ghost" href="map.html">Open full map →</a>
     </div>
-    <a href="map.html" class="mapteaser">
-      <div style="height:280px;position:relative;background:
-        repeating-linear-gradient(0deg,var(--hairline) 0 1px,transparent 1px 32px),
-        repeating-linear-gradient(90deg,var(--hairline) 0 1px,transparent 1px 32px),
-        var(--card-hover);">
-        <span style="position:absolute;left:31%;top:38%;width:9px;height:9px;background:var(--cat-heritage)"></span>
-        <span style="position:absolute;left:63%;top:28%;width:9px;height:9px;background:var(--cat-architecture)"></span>
-        <span style="position:absolute;left:48%;top:62%;width:9px;height:9px;background:var(--cat-museum)"></span>
-        <span style="position:absolute;left:40%;top:20%;width:9px;height:9px;background:var(--cat-urbanism)"></span>
-        <span class="btn btn--primary" style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%)">Architecture near me</span>
-      </div>
-    </a>
+    <div class="mapteaser" style="position:relative">
+      <div id="miniMap" style="height:300px;background:var(--bg);pointer-events:none"></div>
+      <a href="map.html" aria-label="Open full map" style="position:absolute;inset:0;z-index:400"></a>
+      <a href="map.html" class="btn btn--primary" style="position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:500">Architecture near me</a>
+    </div>
   </div>
 </section>
 
@@ -247,6 +242,35 @@
     </div>
   </div>
 </footer>
+
+<script>
+(function(){
+  if(!window.L) return;
+  var css = function(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+  var pts = [
+    [23.0334,72.5262,'--cat-architecture'],[30.7583,76.8065,'--cat-archaeology'],
+    [28.5535,77.2588,'--cat-photography'],[28.5933,77.2507,'--cat-heritage'],
+    [26.9239,75.8267,'--cat-heritage'],[18.9350,72.8267,'--cat-museum'],
+    [12.9794,77.5907,'--cat-heritage'],[34.0837,74.7973,'--cat-heritage']
+  ];
+  var el = document.getElementById('miniMap');
+  if(!el) return;
+  var map = L.map('miniMap',{zoomControl:false,attributionControl:false,dragging:false,
+    scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false,tap:false})
+    .setView([23,80],4);
+  fetch('assets/india.geojson').then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(gj){
+    var layer = L.geoJSON(gj,{ interactive:false, style:{
+      color: css('--hairline')||'#e2e0da', weight:0.7,
+      fillColor: css('--card-hover')||'#faf9f5', fillOpacity:1 } }).addTo(map);
+    try { map.fitBounds(layer.getBounds(),{padding:[10,10]}); } catch(e){}
+    pts.forEach(function(p){
+      L.marker([p[0],p[1]],{ interactive:false, icon:L.divIcon({ className:'',
+        html:'<div style="width:9px;height:9px;background:'+css(p[2])+';border:2px solid #fff;box-shadow:0 0 0 1px '+css(p[2])+'"></div>',
+        iconSize:[9,9], iconAnchor:[4,4] }) }).addTo(map);
+    });
+  }).catch(function(){});
+})();
+</script>
 
 </body>
 </html>
