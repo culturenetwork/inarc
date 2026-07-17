@@ -8,10 +8,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <style>
+  #map { background: var(--bg); }
   .leaflet-popup-content-wrapper{border-radius:0;border:1px solid var(--hairline)}
   .leaflet-popup-content{margin:14px 16px;font-family:var(--font-display)}
   .pop h4{font-family:var(--font-display);font-size:16px;margin:0 0 2px}
   .pop p{margin:0 0 8px;font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .mapnote{font-family:var(--font-mono);font-size:10px;color:var(--muted);position:absolute;right:8px;bottom:6px;z-index:500;background:var(--bg);padding:2px 6px;border:1px solid var(--hairline)}
 </style>
 </head>
 <body>
@@ -44,23 +46,22 @@
         <button class="fbtn" data-f="sacred">Sacred</button>
       </div>
       <div class="filterrow" style="margin-top:6px">
-        <button class="fbtn" onclick="alert('Prototype: would toggle Satellite / Terrain / Street / Architecture layers.')">Layers</button>
+        <button class="fbtn" onclick="alert('Prototype: would toggle base layers.')">Layers</button>
         <button class="fbtn" onclick="alert('Prototype: would show heritage walks, cafés, museums nearby.')">Nearby</button>
         <button class="fbtn" onclick="alert('Prototype: would draw walking / cycling / driving radius circles.')">Radius</button>
       </div>
     </div>
     <div id="list"></div>
   </aside>
-  <div id="map"></div>
+  <div id="map"><div class="mapnote">Boundary: Government of India official map</div></div>
 </div>
 
 <script>
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const CAT = {
-  modern:      getComputedStyle(document.documentElement).getPropertyValue('--cat-architecture').trim() || '#2f5e96',
-  heritage:    getComputedStyle(document.documentElement).getPropertyValue('--cat-heritage').trim() || '#b0392a',
-  brutalist:   getComputedStyle(document.documentElement).getPropertyValue('--cat-archaeology').trim() || '#b3612a',
-  deco:        getComputedStyle(document.documentElement).getPropertyValue('--cat-museum').trim() || '#ab8420',
-  sacred:      getComputedStyle(document.documentElement).getPropertyValue('--cat-photography').trim() || '#6f56a0'
+  modern: css('--cat-architecture')||'#2f5e96', heritage: css('--cat-heritage')||'#b0392a',
+  brutalist: css('--cat-archaeology')||'#b3612a', deco: css('--cat-museum')||'#ab8420',
+  sacred: css('--cat-photography')||'#6f56a0'
 };
 const buildings = [
   {name:"IIM Ahmedabad", arch:"Louis Kahn", yr:1974, city:"Ahmedabad", cat:"modern", lat:23.0334, lng:72.5262, link:"building-iima.html", note:"Brick masterwork of modern institutional design"},
@@ -74,34 +75,58 @@ const buildings = [
   {name:"CST Terminus", arch:"F.W. Stevens", yr:1888, city:"Mumbai", cat:"heritage", lat:18.9398, lng:72.8355, link:"map.html", note:"UNESCO — Victorian Gothic railway cathedral"},
   {name:"Vidhana Soudha", arch:"Kengal Hanumanthaiah", yr:1956, city:"Bengaluru", cat:"heritage", lat:12.9794, lng:77.5907, link:"map.html", note:"Neo-Dravidian granite legislature"},
   {name:"Vidhan Bhavan", arch:"Charles Correa", yr:1996, city:"Bhopal", cat:"modern", lat:23.2599, lng:77.4126, link:"map.html", note:"Correa's monumental state assembly"},
-  {name:"Chhatrapati Museum", arch:"George Wittet", yr:1922, city:"Mumbai", cat:"heritage", lat:18.9269, lng:72.8324, link:"map.html", note:"Indo-Saracenic museum"}
+  {name:"Chhatrapati Museum", arch:"George Wittet", yr:1922, city:"Mumbai", cat:"heritage", lat:18.9269, lng:72.8324, link:"map.html", note:"Indo-Saracenic museum"},
+  {name:"Srinagar (J&K)", arch:"—", yr:0, city:"Srinagar", cat:"heritage", lat:34.0837, lng:74.7973, link:"map.html", note:"Jammu & Kashmir — future coverage"}
 ];
 
-const map = L.map('map', {scrollWheelZoom:true}).setView([22.6, 78.9], 5);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-  attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:19
-}).addTo(map);
+const map = L.map('map', { scrollWheelZoom:true, minZoom:4, maxZoom:12,
+  attributionControl:false }).setView([23.5, 80], 5);
 
+// Vector basemap: India rendered from the official-boundary GeoJSON in /assets.
+// No third-party raster tiles => no disputed / dashed boundaries.
 const markers = {};
 function makeIcon(color){
   return L.divIcon({className:'', html:`<div style="width:12px;height:12px;background:${color};border:2px solid #fff;box-shadow:0 0 0 1px ${color}"></div>`, iconSize:[12,12], iconAnchor:[6,6]});
 }
+function addMarkersAndList(){
+  const listEl = document.getElementById('list');
+  buildings.forEach((b,i)=>{
+    const color = CAT[b.cat] || '#6b6b6b';
+    const m = L.marker([b.lat,b.lng],{icon:makeIcon(color)}).addTo(map);
+    m.bindPopup(`<div class="pop"><h4>${b.name}</h4><p>${b.arch}${b.yr?' · '+b.yr:''} · ${b.city}</p><div style="font-size:13px;margin-bottom:8px;color:var(--muted)">${b.note}</div><a class="btn btn--primary btn--sm" href="${b.link}">View building →</a></div>`);
+    markers[i]=m;
+    const card = document.createElement('a');
+    card.className='mitem'; card.dataset.cat=b.cat; card.href='javascript:void(0)';
+    card.style.borderLeftColor = color;
+    card.innerHTML = `<div class="dot" style="background:${color}"></div><div><h5>${b.name}</h5><p>${b.arch}${b.yr?' · '+b.yr:''} · ${b.city}</p></div>`;
+    card.onclick = ()=>{ map.flyTo([b.lat,b.lng],9,{duration:.8}); m.openPopup(); };
+    listEl.appendChild(card);
+  });
+}
 
-const listEl = document.getElementById('list');
-buildings.forEach((b,i)=>{
-  const color = CAT[b.cat] || '#6b6b6b';
-  const m = L.marker([b.lat,b.lng],{icon:makeIcon(color)}).addTo(map);
-  m.bindPopup(`<div class="pop"><h4>${b.name}</h4><p>${b.arch}${b.yr?' · '+b.yr:''} · ${b.city}</p><div style="font-size:13px;margin-bottom:8px;color:var(--muted)">${b.note}</div><a class="btn btn--primary btn--sm" href="${b.link}">View building →</a></div>`);
-  markers[i]=m;
-
-  const card = document.createElement('a');
-  card.className='mitem'; card.dataset.cat=b.cat; card.href='javascript:void(0)';
-  card.style.borderLeftColor = color;
-  card.innerHTML = `<div class="dot" style="background:${color}"></div>
-    <div><h5>${b.name}</h5><p>${b.arch}${b.yr?' · '+b.yr:''} · ${b.city}</p></div>`;
-  card.onclick = ()=>{ map.flyTo([b.lat,b.lng],13,{duration:.8}); m.openPopup(); };
-  listEl.appendChild(card);
-});
+fetch('assets/india.geojson')
+  .then(r => { if(!r.ok) throw new Error('geojson missing'); return r.json(); })
+  .then(gj => {
+    const layer = L.geoJSON(gj, {
+      style: { color: css('--hairline')||'#e2e0da', weight: 0.8,
+               fillColor: css('--card-hover')||'#faf9f5', fillOpacity: 1 },
+      onEachFeature: (f, l) => {
+        const nm = (f.properties && (f.properties.st_nm || f.properties.NAME_1 || f.properties.name)) || '';
+        if (nm) l.bindTooltip(nm, {sticky:true, className:'statelabel'});
+        l.on('mouseover', ()=> l.setStyle({fillColor: css('--card-bg')||'#fff'}));
+        l.on('mouseout',  ()=> l.setStyle({fillColor: css('--card-hover')||'#faf9f5'}));
+      }
+    }).addTo(map);
+    try { map.fitBounds(layer.getBounds(), {padding:[16,16]}); } catch(e){}
+    map.setMaxBounds(layer.getBounds().pad(0.4));
+    addMarkersAndList();
+  })
+  .catch(() => {
+    // Fallback if the boundary file isn't present yet: plain ground + markers,
+    // still no third-party basemap tiles.
+    document.querySelector('.mapnote').textContent = 'Boundary file not loaded — run fetch-map.sh';
+    addMarkersAndList();
+  });
 
 document.querySelectorAll('#filters .fbtn').forEach(btn=>{
   btn.onclick=()=>{
@@ -109,6 +134,7 @@ document.querySelectorAll('#filters .fbtn').forEach(btn=>{
     btn.classList.add('on');
     const f=btn.dataset.f;
     buildings.forEach((b,i)=>{
+      if(!markers[i]) return;
       const show = f==='all'||b.cat===f;
       if(show) markers[i].addTo(map); else map.removeLayer(markers[i]);
     });
