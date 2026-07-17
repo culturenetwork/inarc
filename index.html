@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IndianArchitecture.org — The Digital Atlas of India's Built Heritage</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__mark">◈</span> IndianArchitecture<span style="color:var(--terracotta)">.org</span>
+    </a>
+    <div class="nav__links">
+      <a href="map.html">Map</a>
+      <a href="city-delhi.html">Cities</a>
+      <a href="architect-kahn.html">Architects</a>
+      <a href="#collections">Collections</a>
+      <a href="building-iima.html">Buildings</a>
+      <a href="#" class="active">Sign in</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">The Digital Atlas of Indian Architecture</div>
+    <h1>Discover Indian Architecture</h1>
+    <p class="lede">Every building, landscape and public space — researched, mapped and made ready to visit. From Mughal tombs to Le Corbusier's Chandigarh.</p>
+
+    <div class="search">
+      <input type="text" placeholder="Search a building, architect, city or style…" aria-label="Search">
+      <button class="btn btn--primary" onclick="window.location='map.html'">Search</button>
+    </div>
+    <div class="search__chips">
+      <span class="chip" onclick="window.location='building-iima.html'">IIM Ahmedabad</span>
+      <span class="chip" onclick="window.location='architect-kahn.html'">Louis Kahn</span>
+      <span class="chip" onclick="window.location='map.html'">Brutalist India</span>
+      <span class="chip" onclick="window.location='city-delhi.html'">Delhi</span>
+      <span class="chip" onclick="window.location='map.html'">Art Deco</span>
+      <span class="chip" onclick="window.location='map.html'">UNESCO Sites</span>
+    </div>
+
+    <p class="hero__quote">“If Google Maps tells you how to get somewhere, IndianArchitecture.org tells you why it matters.”</p>
+  </div>
+</header>
+
+<!-- SEARCH BY -->
+<section class="section" style="padding-top:52px;padding-bottom:8px">
+  <div class="wrap center">
+    <div class="pills" style="justify-content:center">
+      <span class="pill pill--accent">City</span>
+      <span class="pill">Building</span>
+      <span class="pill">Architect</span>
+      <span class="pill">Building Type</span>
+      <span class="pill">Architectural Style</span>
+      <span class="pill">Time Period</span>
+      <span class="pill">State</span>
+      <span class="pill">Material</span>
+      <span class="pill">Accessibility</span>
+    </div>
+  </div>
+</section>
+
+<!-- MAP TEASER -->
+<section class="section" style="padding-top:44px">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <div class="eyebrow">Explore by place</div>
+        <h2>Browse the interactive map</h2>
+        <p>Filter by style, era, access and photography. Find heritage walks, museums and cafés nearby.</p>
+      </div>
+      <a class="btn btn--ghost" href="map.html">Open full map →</a>
+    </div>
+    <a href="map.html" class="mapteaser" style="display:block">
+      <div style="height:300px;position:relative;background:
+        radial-gradient(circle at 30% 40%, rgba(180,85,45,.25), transparent 40%),
+        radial-gradient(circle at 62% 30%, rgba(201,138,43,.25), transparent 40%),
+        repeating-linear-gradient(0deg,#e2d9c8 0 1px,transparent 1px 34px),
+        repeating-linear-gradient(90deg,#e2d9c8 0 1px,transparent 1px 34px),
+        var(--paper-2);">
+        <span style="position:absolute;left:31%;top:38%;width:14px;height:14px;background:var(--terracotta);border-radius:50%;border:3px solid #fff;box-shadow:var(--shadow)"></span>
+        <span style="position:absolute;left:63%;top:28%;width:14px;height:14px;background:var(--green);border-radius:50%;border:3px solid #fff;box-shadow:var(--shadow)"></span>
+        <span style="position:absolute;left:48%;top:62%;width:14px;height:14px;background:var(--ochre);border-radius:50%;border:3px solid #fff;box-shadow:var(--shadow)"></span>
+        <span style="position:absolute;left:40%;top:20%;width:14px;height:14px;background:#3a4d5d;border-radius:50%;border:3px solid #fff;box-shadow:var(--shadow)"></span>
+        <div style="position:absolute;left:50%;bottom:20px;transform:translateX(-50%)" class="btn btn--primary">📍 Architecture near me</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FEATURED COLLECTIONS -->
+<section class="section" id="collections" style="padding-top:24px">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <div class="eyebrow">Curated editorial</div>
+        <h2>Featured collections</h2>
+        <p>Handpicked routes through India's built legacy — for architects, students, travellers and photographers.</p>
+      </div>
+    </div>
+
+    <div class="grid grid--3">
+      <a class="card" href="building-iima.html">
+        <div class="card__img ph-brick"><span class="tag">14 buildings</span><span class="ico">◈</span></div>
+        <div class="card__body">
+          <h3>India's Greatest Buildings</h3>
+          <p>The essential works every architect should experience in person.</p>
+          <div class="card__meta">Delhi · Ahmedabad · Chandigarh →</div>
+        </div>
+      </a>
+      <a class="card" href="map.html">
+        <div class="card__img ph4"><span class="tag">UNESCO</span><span class="ico">🏛</span></div>
+        <div class="card__body">
+          <h3>World Heritage Sites</h3>
+          <p>India's 40+ UNESCO-inscribed monuments and cultural landscapes.</p>
+          <div class="card__meta">Across 21 states →</div>
+        </div>
+      </a>
+      <a class="card" href="architect-kahn.html">
+        <div class="card__img ph2"><span class="tag">Modern Masters</span><span class="ico">▤</span></div>
+        <div class="card__body">
+          <h3>Modern Masters</h3>
+          <p>Kahn, Corbusier, Correa, Doshi, Raje — the architects who shaped modern India.</p>
+          <div class="card__meta">9 architects →</div>
+        </div>
+      </a>
+      <a class="card" href="map.html">
+        <div class="card__img ph1"><span class="tag">Concrete</span><span class="ico">▦</span></div>
+        <div class="card__body">
+          <h3>Brutalist India</h3>
+          <p>Raw concrete civic monuments from the decades after independence.</p>
+          <div class="card__meta">18 buildings →</div>
+        </div>
+      </a>
+      <a class="card" href="map.html">
+        <div class="card__img ph3"><span class="tag">1920–1950</span><span class="ico">◹</span></div>
+        <div class="card__body">
+          <h3>Art Deco India</h3>
+          <p>Mumbai's seafront ensemble — the world's second-largest Art Deco collection.</p>
+          <div class="card__meta">Marine Drive walk →</div>
+        </div>
+      </a>
+      <a class="card" href="map.html">
+        <div class="card__img ph5"><span class="tag">Palaces</span><span class="ico">♜</span></div>
+        <div class="card__body">
+          <h3>Palace Architecture</h3>
+          <p>Rajput, Mughal and Indo-Saracenic royal residences across the subcontinent.</p>
+          <div class="card__meta">Jaipur · Udaipur · Mysore →</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="pills" style="margin-top:24px">
+      <span class="pill">Hidden Gems</span>
+      <span class="pill">Sacred Architecture</span>
+      <span class="pill">Adaptive Reuse</span>
+      <span class="pill">Public Spaces</span>
+      <span class="pill">Landscapes</span>
+      <span class="pill">Museums</span>
+      <span class="pill">Weekend Destinations</span>
+      <span class="pill">Women Architects of India</span>
+      <span class="pill">Lost Buildings</span>
+    </div>
+  </div>
+</section>
+
+<!-- CITY ROLLOUT -->
+<section class="section" style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <div class="eyebrow">Geographic rollout</div>
+        <h2>Launching city by city</h2>
+        <p>The database grows continually and never becomes obsolete. Every significant city, town and heritage region will be covered.</p>
+      </div>
+    </div>
+    <div class="grid grid--3">
+      <div class="phase">
+        <h4>Phase 1 — Live</h4>
+        <ul>
+          <li><a href="city-delhi.html">Delhi</a> <span class="badge">128 buildings</span></li>
+        </ul>
+      </div>
+      <div class="phase">
+        <h4>Phase 2 — In progress</h4>
+        <ul>
+          <li>Chandigarh <span class="badge">soon</span></li>
+          <li>Ahmedabad <span class="badge">soon</span></li>
+          <li>Mumbai <span class="badge">soon</span></li>
+          <li>Jaipur <span class="badge">soon</span></li>
+        </ul>
+      </div>
+      <div class="phase">
+        <h4>Phase 3 — Planned</h4>
+        <ul>
+          <li>Bengaluru · Hyderabad</li>
+          <li>Chennai · Kolkata · Pune</li>
+          <li>Kochi · Lucknow · Bhopal</li>
+          <li>Goa <span class="badge">and beyond</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI ASSISTANT -->
+<section class="section">
+  <div class="wrap">
+    <div class="grid grid--2" style="align-items:center;gap:40px">
+      <div>
+        <div class="eyebrow">Ask anything</div>
+        <h2 style="font-size:34px;margin-bottom:14px">The architecture assistant</h2>
+        <p class="muted" style="font-size:16.5px">Natural-language planning that understands buildings, access, timing and light.</p>
+        <div style="display:grid;gap:10px;margin-top:20px">
+          <div class="notice" style="text-align:left">“I have three hours in Ahmedabad — what should I see?”</div>
+          <div class="notice" style="text-align:left">“Show me Brutalist buildings near Connaught Place.”</div>
+          <div class="notice" style="text-align:left">“Which buildings have the best sunset photography?”</div>
+        </div>
+      </div>
+      <div class="crosslink">
+        <div>
+          <h3>Paired with DelhiCulture</h3>
+          <p>Buildings answer <em>what should I experience & why</em>. DelhiCulture answers <em>what's happening today</em> — exhibitions, performances and festivals inside these very spaces.</p>
+        </div>
+        <a class="btn" style="background:#fff;color:var(--ink)" href="#">Explore events →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <div class="foot__brand">◈ IndianArchitecture.org</div>
+        <p style="max-width:320px;font-size:14px">A living architectural atlas of India — rigorous scholarship fused with practical travel guidance. Every page answers: what is this, why does it matter, why visit, and how to experience it best.</p>
+      </div>
+      <div><h5>Explore</h5><ul><li><a href="map.html">Interactive map</a></li><li><a href="#collections">Collections</a></li><li><a href="city-delhi.html">Cities</a></li><li><a href="architect-kahn.html">Architects</a></li></ul></div>
+      <div><h5>Discover</h5><ul><li><a href="#">Editorial</a></li><li><a href="#">Photography guides</a></li><li><a href="#">Itineraries</a></li><li><a href="#">Near me</a></li></ul></div>
+      <div><h5>About</h5><ul><li><a href="#">The project</a></li><li><a href="#">Data & sources</a></li><li><a href="#">Contribute</a></li><li><a href="#">DelhiCulture</a></li></ul></div>
+    </div>
+    <div class="foot__note">
+      <span>© 2026 IndianArchitecture.org — Prototype</span>
+      <span>Delhi · Chandigarh · Ahmedabad · Mumbai · Jaipur · and every city to come</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
