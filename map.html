@@ -8,17 +8,17 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <style>
-  .leaflet-popup-content-wrapper{border-radius:12px}
-  .leaflet-popup-content{margin:14px 16px;font-family:var(--sans)}
-  .pop h4{font-family:var(--serif);font-size:17px;margin:0 0 2px}
-  .pop p{margin:0 0 8px;font-size:12.5px;color:var(--muted)}
+  .leaflet-popup-content-wrapper{border-radius:0;border:1px solid var(--hairline)}
+  .leaflet-popup-content{margin:14px 16px;font-family:var(--font-display)}
+  .pop h4{font-family:var(--font-display);font-size:16px;margin:0 0 2px}
+  .pop p{margin:0 0 8px;font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 </style>
 </head>
 <body>
 
 <nav class="nav">
   <div class="wrap nav__inner">
-    <a class="brand" href="index.html"><span class="brand__mark">◈</span> IndianArchitecture<span style="color:var(--terracotta)">.org</span></a>
+    <a class="brand" href="index.html"><span class="brand__mark">◈</span>&nbsp;Indian<strong>Architecture</strong>.org</a>
     <div class="nav__links">
       <a href="map.html" class="active">Map</a>
       <a href="city-delhi.html">Cities</a>
@@ -32,9 +32,9 @@
 <div class="maproot">
   <aside class="mapside">
     <div class="mapside__head">
-      <div class="eyebrow">Architecture near you</div>
-      <h2 style="font-size:22px;margin:4px 0 2px">Explore the map</h2>
-      <p class="muted" style="font-size:13px;margin:0">Filter India's built heritage. Click a marker or a card.</p>
+      <span class="eyebrow">Architecture near you</span>
+      <h2 style="font-size:20px;margin:4px 0 2px">Explore the map</h2>
+      <p class="muted" style="font-size:12.5px;margin:0">Filter India's built heritage. Click a marker or a card.</p>
       <div class="filterrow" id="filters">
         <button class="fbtn on" data-f="all">All</button>
         <button class="fbtn" data-f="modern">Modern</button>
@@ -43,10 +43,10 @@
         <button class="fbtn" data-f="deco">Art Deco</button>
         <button class="fbtn" data-f="sacred">Sacred</button>
       </div>
-      <div class="filterrow" style="margin-top:8px">
-        <button class="fbtn" onclick="alert('Prototype: would toggle Satellite / Terrain / Street / Architecture layers.')">🛰 Layers</button>
-        <button class="fbtn" onclick="alert('Prototype: would show heritage walks, cafés, museums nearby.')">☕ Nearby</button>
-        <button class="fbtn" onclick="alert('Prototype: would draw walking / cycling / driving radius circles.')">◎ Radius</button>
+      <div class="filterrow" style="margin-top:6px">
+        <button class="fbtn" onclick="alert('Prototype: would toggle Satellite / Terrain / Street / Architecture layers.')">Layers</button>
+        <button class="fbtn" onclick="alert('Prototype: would show heritage walks, cafés, museums nearby.')">Nearby</button>
+        <button class="fbtn" onclick="alert('Prototype: would draw walking / cycling / driving radius circles.')">Radius</button>
       </div>
     </div>
     <div id="list"></div>
@@ -55,19 +55,26 @@
 </div>
 
 <script>
+const CAT = {
+  modern:      getComputedStyle(document.documentElement).getPropertyValue('--cat-architecture').trim() || '#2f5e96',
+  heritage:    getComputedStyle(document.documentElement).getPropertyValue('--cat-heritage').trim() || '#b0392a',
+  brutalist:   getComputedStyle(document.documentElement).getPropertyValue('--cat-archaeology').trim() || '#b3612a',
+  deco:        getComputedStyle(document.documentElement).getPropertyValue('--cat-museum').trim() || '#ab8420',
+  sacred:      getComputedStyle(document.documentElement).getPropertyValue('--cat-photography').trim() || '#6f56a0'
+};
 const buildings = [
-  {name:"IIM Ahmedabad", arch:"Louis Kahn", yr:1974, city:"Ahmedabad", cat:"modern", color:"#b4552d", lat:23.0334, lng:72.5262, link:"building-iima.html", note:"Brick masterwork of modern institutional design"},
-  {name:"Capitol Complex", arch:"Le Corbusier", yr:1962, city:"Chandigarh", cat:"brutalist", color:"#8e3f1f", lat:30.7583, lng:76.8065, link:"map.html", note:"UNESCO — sculptural raw concrete government seat"},
-  {name:"Sabarmati Ashram", arch:"Charles Correa", yr:1963, city:"Ahmedabad", cat:"modern", color:"#4a5d3a", lat:23.0605, lng:72.5806, link:"map.html", note:"Gandhi memorial museum, modular pavilions"},
-  {name:"Lotus Temple", arch:"Fariborz Sahba", yr:1986, city:"Delhi", cat:"sacred", color:"#3a4d5d", lat:28.5535, lng:77.2588, link:"map.html", note:"Marble Bahá'í house of worship"},
-  {name:"Humayun's Tomb", arch:"Mirak Mirza Ghiyas", yr:1572, city:"Delhi", cat:"heritage", color:"#c98a2b", lat:28.5933, lng:77.2507, link:"city-delhi.html", note:"UNESCO — first great Mughal garden-tomb"},
-  {name:"Jantar Mantar", arch:"Sawai Jai Singh II", yr:1734, city:"Jaipur", cat:"heritage", color:"#c98a2b", lat:26.9247, lng:75.8244, link:"map.html", note:"UNESCO — monumental astronomical instruments"},
-  {name:"Hawa Mahal", arch:"Lal Chand Ustad", yr:1799, city:"Jaipur", cat:"heritage", color:"#b4552d", lat:26.9239, lng:75.8267, link:"map.html", note:"953-window pink sandstone screen facade"},
-  {name:"Eros Cinema", arch:"Sohrab Bhedwar", yr:1938, city:"Mumbai", cat:"deco", color:"#8f5f14", lat:18.9350, lng:72.8267, link:"map.html", note:"Marine Drive Art Deco landmark"},
-  {name:"CST Terminus", arch:"F.W. Stevens", yr:1888, city:"Mumbai", cat:"heritage", color:"#c98a2b", lat:18.9398, lng:72.8355, link:"map.html", note:"UNESCO — Victorian Gothic railway cathedral"},
-  {name:"Vidhana Soudha", arch:"Kengal Hanumanthaiah", yr:1956, city:"Bengaluru", cat:"heritage", color:"#4a5d3a", lat:12.9794, lng:77.5907, link:"map.html", note:"Neo-Dravidian granite legislature"},
-  {name:"National Assembly (concept)", arch:"—", yr:0, city:"Bhopal", cat:"modern", color:"#b4552d", lat:23.2599, lng:77.4126, link:"map.html", note:"Vidhan Bhavan by Charles Correa"},
-  {name:"Chhatrapati Museum", arch:"George Wittet", yr:1922, city:"Mumbai", cat:"heritage", color:"#c98a2b", lat:18.9269, lng:72.8324, link:"map.html", note:"Indo-Saracenic museum"},
+  {name:"IIM Ahmedabad", arch:"Louis Kahn", yr:1974, city:"Ahmedabad", cat:"modern", lat:23.0334, lng:72.5262, link:"building-iima.html", note:"Brick masterwork of modern institutional design"},
+  {name:"Capitol Complex", arch:"Le Corbusier", yr:1962, city:"Chandigarh", cat:"brutalist", lat:30.7583, lng:76.8065, link:"map.html", note:"UNESCO — sculptural raw concrete government seat"},
+  {name:"Sabarmati Ashram", arch:"Charles Correa", yr:1963, city:"Ahmedabad", cat:"modern", lat:23.0605, lng:72.5806, link:"map.html", note:"Gandhi memorial museum, modular pavilions"},
+  {name:"Lotus Temple", arch:"Fariborz Sahba", yr:1986, city:"Delhi", cat:"sacred", lat:28.5535, lng:77.2588, link:"map.html", note:"Marble Bahá'í house of worship"},
+  {name:"Humayun's Tomb", arch:"Mirak Mirza Ghiyas", yr:1572, city:"Delhi", cat:"heritage", lat:28.5933, lng:77.2507, link:"city-delhi.html", note:"UNESCO — first great Mughal garden-tomb"},
+  {name:"Jantar Mantar", arch:"Sawai Jai Singh II", yr:1734, city:"Jaipur", cat:"heritage", lat:26.9247, lng:75.8244, link:"map.html", note:"UNESCO — monumental astronomical instruments"},
+  {name:"Hawa Mahal", arch:"Lal Chand Ustad", yr:1799, city:"Jaipur", cat:"heritage", lat:26.9239, lng:75.8267, link:"map.html", note:"953-window pink sandstone screen facade"},
+  {name:"Eros Cinema", arch:"Sohrab Bhedwar", yr:1938, city:"Mumbai", cat:"deco", lat:18.9350, lng:72.8267, link:"map.html", note:"Marine Drive Art Deco landmark"},
+  {name:"CST Terminus", arch:"F.W. Stevens", yr:1888, city:"Mumbai", cat:"heritage", lat:18.9398, lng:72.8355, link:"map.html", note:"UNESCO — Victorian Gothic railway cathedral"},
+  {name:"Vidhana Soudha", arch:"Kengal Hanumanthaiah", yr:1956, city:"Bengaluru", cat:"heritage", lat:12.9794, lng:77.5907, link:"map.html", note:"Neo-Dravidian granite legislature"},
+  {name:"Vidhan Bhavan", arch:"Charles Correa", yr:1996, city:"Bhopal", cat:"modern", lat:23.2599, lng:77.4126, link:"map.html", note:"Correa's monumental state assembly"},
+  {name:"Chhatrapati Museum", arch:"George Wittet", yr:1922, city:"Mumbai", cat:"heritage", lat:18.9269, lng:72.8324, link:"map.html", note:"Indo-Saracenic museum"}
 ];
 
 const map = L.map('map', {scrollWheelZoom:true}).setView([22.6, 78.9], 5);
@@ -77,22 +84,23 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
 
 const markers = {};
 function makeIcon(color){
-  return L.divIcon({className:'', html:`<div style="width:20px;height:20px;background:${color};border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>`, iconSize:[20,20], iconAnchor:[10,18]});
+  return L.divIcon({className:'', html:`<div style="width:12px;height:12px;background:${color};border:2px solid #fff;box-shadow:0 0 0 1px ${color}"></div>`, iconSize:[12,12], iconAnchor:[6,6]});
 }
 
 const listEl = document.getElementById('list');
 buildings.forEach((b,i)=>{
-  const m = L.marker([b.lat,b.lng],{icon:makeIcon(b.color)}).addTo(map);
-  m.bindPopup(`<div class="pop"><h4>${b.name}</h4><p>${b.arch}${b.yr?' · '+b.yr:''} · ${b.city}</p><div style="font-size:12.5px;margin-bottom:8px">${b.note}</div><a class="btn btn--primary btn--sm" href="${b.link}">View building →</a></div>`);
-  m.cat = b.cat; markers[i]=m;
+  const color = CAT[b.cat] || '#6b6b6b';
+  const m = L.marker([b.lat,b.lng],{icon:makeIcon(color)}).addTo(map);
+  m.bindPopup(`<div class="pop"><h4>${b.name}</h4><p>${b.arch}${b.yr?' · '+b.yr:''} · ${b.city}</p><div style="font-size:13px;margin-bottom:8px;color:var(--muted)">${b.note}</div><a class="btn btn--primary btn--sm" href="${b.link}">View building →</a></div>`);
+  markers[i]=m;
 
-  const card = document.createElement('div');
-  card.className='mitem'; card.dataset.cat=b.cat;
-  card.innerHTML = `<div class="dot" style="background:${b.color}"></div>
+  const card = document.createElement('a');
+  card.className='mitem'; card.dataset.cat=b.cat; card.href='javascript:void(0)';
+  card.style.borderLeftColor = color;
+  card.innerHTML = `<div class="dot" style="background:${color}"></div>
     <div><h5>${b.name}</h5><p>${b.arch}${b.yr?' · '+b.yr:''} · ${b.city}</p></div>`;
   card.onclick = ()=>{ map.flyTo([b.lat,b.lng],13,{duration:.8}); m.openPopup(); };
   listEl.appendChild(card);
-  card.dataset.i=i;
 });
 
 document.querySelectorAll('#filters .fbtn').forEach(btn=>{
