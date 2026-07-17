@@ -1,68 +1,82 @@
 #!/usr/bin/env bash
-# Downloads the lead photo for each building from Wikipedia into ./images/.
-# Run this ON YOUR MAC (this repo's folder), where the network is open:
+# Downloads a royalty-free lead photo for each building into ./images/.
+# Sources: Wikipedia lead image first, then a Wikimedia Commons search
+# fallback (Commons media is CC / public-domain). Run ON YOUR MAC:
 #     cd ~/Projects/indianarchitecture.org
 #     bash fetch-images.sh
-# Then commit + push. Cards use images/<slug>.jpg and fall back to a
-# coloured tile if a file is missing, so partial runs are safe.
+#     git add images && git commit -m "Add building photos" && git push
+# Safe to re-run: it skips files that already exist.
 
 set -u
 cd "$(dirname "$0")"
 mkdir -p images
 UA="inarc-image-fetch/1.0 (https://indianarchitecture.org; ab@bbarch.net)"
 
-# slug  ->  Wikipedia article title
-titles=(
-  "greatest-buildings|Taj Mahal"
-  "world-heritage|Humayun's Tomb"
-  "modern-masters|Indian Institute of Management Ahmedabad"
-  "brutalist-india|Chandigarh Capitol Complex"
-  "artdeco-india|Eros Cinema"
-  "palace-architecture|Hawa Mahal"
-  "humayuns-tomb|Humayun's Tomb"
-  "qutb-minar|Qutb Minar"
-  "rashtrapati-bhavan|Rashtrapati Bhavan"
-  "lotus-temple|Lotus Temple"
-  "hall-of-nations|Hall of Nations, New Delhi"
-  "connaught-place|Connaught Place, New Delhi"
-  "sabarmati-ashram|Sabarmati Ashram"
-  "mill-owners|Mill Owners' Association Building"
-  "iim-ahmedabad|Indian Institute of Management Ahmedabad"
-  "national-assembly-dhaka|Jatiya Sangsad Bhaban"
+# slug | Wikipedia article title | Commons search terms (fallback)
+rows=(
+  "greatest-buildings|Taj Mahal|Taj Mahal"
+  "world-heritage|Humayun's Tomb|Humayun's Tomb Delhi"
+  "modern-masters|Indian Institute of Management Ahmedabad|IIM Ahmedabad Louis Kahn campus"
+  "brutalist-india|Chandigarh Capitol Complex|Chandigarh Capitol Complex Le Corbusier"
+  "artdeco-india|Eros Cinema|Eros Cinema Mumbai"
+  "palace-architecture|Hawa Mahal|Hawa Mahal Jaipur"
+  "humayuns-tomb|Humayun's Tomb|Humayun's Tomb Delhi"
+  "qutb-minar|Qutb Minar|Qutb Minar Delhi"
+  "rashtrapati-bhavan|Rashtrapati Bhavan|Rashtrapati Bhavan"
+  "lotus-temple|Lotus Temple|Lotus Temple Delhi"
+  "hall-of-nations|Hall of Nations, New Delhi|Hall of Nations Pragati Maidan"
+  "connaught-place|Connaught Place, New Delhi|Connaught Place New Delhi"
+  "sabarmati-ashram|Sabarmati Ashram|Sabarmati Ashram Ahmedabad"
+  "mill-owners|Mill Owners' Association Building|Mill Owners Association Building Ahmedabad"
+  "iim-ahmedabad|Indian Institute of Management Ahmedabad|IIM Ahmedabad Louis Kahn campus"
+  "national-assembly-dhaka|Jatiya Sangsad Bhaban|Jatiya Sangsad Bhaban Dhaka"
 )
 
-get_url() {  # $1 = article title -> prints original image URL (or nothing)
-  python3 - "$1" <<'PY'
+resolve() {  # $1 title, $2 commons-search -> prints a direct image URL
+  python3 - "$1" "$2" <<'PY'
 import sys, json, urllib.parse, urllib.request
-title = sys.argv[1]
-api = ("https://en.wikipedia.org/w/api.php?action=query&format=json"
-       "&prop=pageimages&piprop=original&redirects=1&titles="
-       + urllib.parse.quote(title))
-req = urllib.request.Request(api, headers={"User-Agent":
-      "inarc-image-fetch/1.0 (https://indianarchitecture.org; ab@bbarch.net)"})
+title, search = sys.argv[1], sys.argv[2]
+UA = {"User-Agent": "inarc-image-fetch/1.0 (https://indianarchitecture.org; ab@bbarch.net)"}
+def get(url):
+    return json.load(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=25))
+# 1) Wikipedia lead image
 try:
-    data = json.load(urllib.request.urlopen(req, timeout=20))
-    for p in data["query"]["pages"].values():
+    d = get("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages"
+            "&piprop=original&redirects=1&titles=" + urllib.parse.quote(title))
+    for p in d["query"]["pages"].values():
         if "original" in p:
-            print(p["original"]["source"]); break
+            print(p["original"]["source"]); sys.exit()
 except Exception as e:
-    sys.stderr.write(f"  ! {e}\n")
+    sys.stderr.write(f"  wp: {e}\n")
+# 2) Wikimedia Commons image search (royalty-free)
+try:
+    d = get("https://commons.wikimedia.org/w/api.php?action=query&format=json"
+            "&generator=search&gsrnamespace=6&gsrlimit=8&gsrsearch=" + urllib.parse.quote(search) +
+            "&prop=imageinfo&iiprop=url|mime&iiurlwidth=1280")
+    pages = list(d.get("query", {}).get("pages", {}).values())
+    pages.sort(key=lambda p: p.get("index", 99))
+    for p in pages:
+        ii = p.get("imageinfo", [{}])[0]
+        mime = ii.get("mime", "")
+        if mime.startswith("image/") and mime not in ("image/svg+xml",):
+            print(ii.get("thumburl") or ii.get("url")); sys.exit()
+except Exception as e:
+    sys.stderr.write(f"  commons: {e}\n")
 PY
 }
 
-for row in "${titles[@]}"; do
-  slug="${row%%|*}"; title="${row#*|}"
-  url="$(get_url "$title")"
+for row in "${rows[@]}"; do
+  IFS='|' read -r slug title search <<< "$row"
+  if [ -s "images/$slug.jpg" ]; then echo "= keep images/$slug.jpg"; continue; fi
+  url="$(resolve "$title" "$search")"
   if [ -n "$url" ]; then
-    echo "↓ $slug  ←  $title"
+    echo "↓ $slug  ←  $url"
     curl -sL --fail -H "User-Agent: $UA" "$url" -o "images/$slug.jpg" \
-      && echo "   saved images/$slug.jpg" \
-      || echo "   ! download failed"
+      && echo "   saved images/$slug.jpg" || echo "   ! download failed"
   else
-    echo "✗ no lead image found for: $title  ($slug) — will use placeholder"
+    echo "✗ nothing found for: $title  ($slug)"
   fi
   sleep 0.3
 done
-
 echo
-echo "Done. Review ./images/, then:  git add images && git commit -m 'Add building photos' && git push"
+echo "Done. Then:  git add images && git commit -m 'Add building photos' && git push"
