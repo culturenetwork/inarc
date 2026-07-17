@@ -272,7 +272,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 @media (max-width:760px){ .highlights{ grid-template-columns:repeat(2,1fr);} }
 @media (max-width:480px){ .highlights{ grid-template-columns:1fr;} }
 .hl { background: var(--card-bg); border-left: var(--stripe) solid var(--cat-color, var(--cat-heritage)); }
-.hl__img { aspect-ratio: 16/10; background: var(--card-hover); border-bottom: 1px solid var(--hairline); }
+.hl__img { position:relative; overflow:hidden; aspect-ratio: 16/10; background: var(--card-hover); border-bottom: 1px solid var(--hairline); }
 .hl__t { padding: 10px 12px; font-size: 13px; font-weight: 600; }
 
 /* timeline */
@@ -320,3 +320,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spac
 
 /* ---------- motion ---------- */
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* --- card photos (hotlinked, graceful fallback to placeholder) --- */
+.card__img { position: relative; overflow: hidden; }
+.card__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+.card__img .tag { z-index: 2; }
+.card__img .ico { position: relative; z-index: 0; }
+.brand .wordmark { white-space: nowrap; }
